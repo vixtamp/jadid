@@ -1,25 +1,41 @@
 using System;
-using System.IO;
+using System.Drawing;
+using System.Windows.Forms;
 
 class Program
 {
     static void Main()
     {
-        // مسیر دسکتاپ کاربر
-        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        try
+        {
+            // ابعاد صفحه نمایش
+            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
 
-        // نام فایل متنی
-        string fileName = "تاریخ_فعلی.txt";
+            // ایجاد یک تصویر Bitmap با ابعاد صفحه
+            using (Bitmap bitmap = new Bitmap(screenWidth, screenHeight))
+            {
+                // گرفتن گرافیک از تصویر
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    // گرفتن اسکرین شات
+                    g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+                }
 
-        // مسیر کامل فایل
-        string filePath = Path.Combine(desktopPath, fileName);
+                // مسیر دسکتاپ
+                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string fileName = "Screenshot_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
+                string filePath = System.IO.Path.Combine(desktopPath, fileName);
 
-        // تاریخ فعلی
-        string currentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                // ذخیره تصویر به صورت PNG
+                bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
 
-        // نوشتن تاریخ در فایل
-        File.WriteAllText(filePath, currentDate);
-
-        Console.WriteLine("فایل با موفقیت ایجاد شد: " + filePath);
+                Console.WriteLine("اسکرین شات با موفقیت ذخیره شد: " + filePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("خطا در گرفتن اسکرین شات: " + ex.Message);
+        }
     }
 }
